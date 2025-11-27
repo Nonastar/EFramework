@@ -3,13 +3,12 @@
  * 支持TypeScript继承，确保每个子类都有独立的单例实例
  */
 export abstract class Singleton implements IInitialize, IDisposable {
-    public static instance() : any {
+    public static instance<T extends new (...args: any[]) => any>(this : T) : InstanceType<T> {
         let c : any = this;
         if(!c._instance)c._instance = new c();
         return c._instance;
     }
 
-    protected constructor() {}
 
 
     public beginInit(): void {

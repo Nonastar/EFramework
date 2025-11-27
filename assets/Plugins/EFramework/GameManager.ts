@@ -12,6 +12,8 @@ import { Component, Node, director } from "cc";
 class GameManager extends Component {
     private static _instance: GameManager;
 
+    private _childManagers: IManager[] = [];
+
     public static get instance() {
         if (GameManager._instance) return;
 
@@ -30,20 +32,30 @@ class GameManager extends Component {
 
     start() { }
 
-    public addChildManager(manager: Component) {
-        this.node.addChild(manager.node);
+    public addChildManager(manager: IManager) {
+        this._childManagers.push(manager);
     }
 
-    update(deltaTime: number) {}
+    protected update(deltaTime: number) {
+        this._childManagers.forEach(manager => {
+            manager.onUpdate?.(deltaTime);
+        });
+    }
 
-    lateUpdate(deltaTime: number) { }
+    protected lateUpdate(deltaTime: number) { 
+        this._childManagers.forEach(manager => {
+            manager.onLateUpdate?.(deltaTime);
+        });
+    }
 
-    onDisable() { }
+    protected onDisable() { }
 
-    onDestroy() {
+    protected onDestroy() {
+        this._childManagers.forEach(manager => {
+            manager.onDestroy?.();
+        });
         GameManager._instance = null;
     }
-
 }
 
 export { GameManager }; 

@@ -2,7 +2,7 @@ import { Node } from "cc";
 import { NodeBind } from "../Utiles/NodeBind";
 
 class UIViewBase  {
-    public node?: Node = null;
+    public node: Node = null;
     protected nodeBind?: NodeBind = null;
 
     onLoad() {
@@ -16,34 +16,21 @@ class UIViewBase  {
         this.node = node;
         this.nodeBind = this.node.getComponent(NodeBind)
     }
+
+    onUpdate?(deltaTime: number) : void
+    onLateUpdate?(deltaTime: number) : void
     
-    onHide() {
-    }
+    onHide?() : void
 
-    onClose() {
-
-    }
+    onClose?() : void
     
-    onDestroy() {
-    }
+    onDestroy?() : void
 
-    onResume() {
-    }
+    onResume?() : void
 
-    onPause() {
-    }
+    onPause?() : void
 
-    onFocus() {
-    }
     
-    onBlur() {
-    }
-
-    onBack() {
-    }
-
-    close() {
-    }
 }
 
 export { UIViewBase };

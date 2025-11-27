@@ -1,9 +1,11 @@
-import { UIConfig,  UILayer, UIMaskType } from "../../EFramework/UI/UIConfig";
-import { UIRegistry } from "../../EFramework/UI/UIRegistry";
-import { MainPanel } from "./MainPanel";
+import { UIConfig,  UILayer, UIMaskType } from "../../Plugins/EFramework/UI/UIConfig";
+import { UIRegistry } from "../../Plugins/EFramework/UI/UIRegistry";
+import { TestPane2 } from "./TestPanel2";
+import { TestPane3 } from "./TestPanel3";
 
 
-//UIRegistry.register(MainPanel, {prefab: "db://assets/resources/MainPanel.prafab", layer: UILayer.Common});
+UIRegistry.register(TestPane2, {prefab: "db://assets/resources/TestPanel2.prafab", layer: UILayer.Common});
+UIRegistry.register(TestPane3, {prefab: "db://assets/resources/TestPanel2.prafab", layer: UILayer.Common});
 
 
 // 便捷配置生成器

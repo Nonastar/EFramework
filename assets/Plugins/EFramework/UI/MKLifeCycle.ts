@@ -1,14 +1,15 @@
 import { EDITOR } from "cc/env";
+import MKLogger from "../Utiles/ELogger";
 /** @weak */
-//import mkMonitor from "../MKMonitor";
-import ETask from "../Core/Task/ETask";
+import MKStatusTask from "../Core/Task/ETask";
 import MKLayer from "./MKLayer";
 /** @weak */
 import { mkAudio, MKAudio_ } from "../Audio/MKAudioExport";
 import MKRelease, { MKRelease_ } from "../Resources/MKRelease";
+import GlobalConfig from "../GlobalConfig";
 import { _decorator, js, CCClass, isValid, Node, Asset } from "cc";
 // @weak-start-include-MKUIManage
-import uiManage from "./UIManage";
+import { uiManager } from "../UI/UIManager";
 // @weak-end
 const { ccclass, property } = _decorator;
 
@@ -85,6 +86,7 @@ export class MKLifeCycle extends MKLayer implements MKRelease_.TypeFollowRelease
 			return;
 		}
 
+		
 	}
 
 	/* --------------- public --------------- */
@@ -129,11 +131,11 @@ export class MKLifeCycle extends MKLayer implements MKRelease_.TypeFollowRelease
 	/** 静态模块 */
 	protected _isStatic = true;
 	/** onLoad 任务 */
-	protected _onLoadTask = new ETask(false);
+	protected _onLoadTask = new MKStatusTask(false);
 	/** create 任务 */
-	protected _createTask = new ETask(false);
+	protected _createTask = new MKStatusTask(false);
 	/** open 任务 */
-	protected _openTask = new ETask(false);
+	protected _openTask = new MKStatusTask(false);
 	/** 运行状态 */
 	protected _state = _MKLifeCycle.RunState.Close;
 	/**
@@ -149,13 +151,13 @@ export class MKLifeCycle extends MKLayer implements MKRelease_.TypeFollowRelease
 	protected _isResetData = true;
 
 	/** 日志 */
-	protected get _log(): Console {
-		return console
+	protected get _log(): MKLogger {
+		return this._log2 ?? (this._log2 = new MKLogger(js.getClassName(this)));
 	}
 
 	/* --------------- private --------------- */
 	/** 日志 */
-	private _log2!: Console;
+	private _log2!: MKLogger;
 	/** 初始化计数（防止 onLoad 前多次初始化调用多次 init） */
 	private _waitInitNum = 0;
 	/* ------------------------------- 生命周期 ------------------------------- */
@@ -302,22 +304,14 @@ export class MKLifeCycle extends MKLayer implements MKRelease_.TypeFollowRelease
 
 		// 取消所有定时器
 		this.unscheduleAllCallbacks();
-		// @weak-start-include-MKMonitor
-		// 取消数据监听事件
-		{
-			/* const task = mkMonitor.clear(this);
-
-			if (task) {
-				await task;
-			} */
-		}
+		
 		// @weak-end
 
 		// 释放资源
 		await this._releaseManage.releaseAll();
 		// 重置数据
 		if (this.data && this._isResetData) {
-			//mkToolObject.reset(this.data, true);
+			
 		}
 	}
 
@@ -511,7 +505,7 @@ export class MKLifeCycle extends MKLayer implements MKRelease_.TypeFollowRelease
 			// 回收
 			else {
 				// @weak-start-include-MKUIManage
-				uiManage.close(this.node);
+				//uiManager.close(this.node);
 				// @weak-end
 
 				return;

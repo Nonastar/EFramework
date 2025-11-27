@@ -1,4 +1,4 @@
-import EEvent from "../EFramework/Event/EEvent";
+import EEvent from "../Plugins/EFramework/Event/EEvent";
 
 /**
  * 游戏事件类型定义
