@@ -2,7 +2,7 @@ import { Singleton } from "../Utiles/Singleton";
 import { EventTarget } from "cc";
 
 
-class EventManager extends Singleton<EventManager> {
+class EventManager extends Singleton {
     private _event: EventTarget = new EventTarget();
 
     on<T extends IEvent, T2 extends (event_: IEvent) => void>(

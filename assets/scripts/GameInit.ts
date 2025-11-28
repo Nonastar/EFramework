@@ -1,10 +1,6 @@
 import { _decorator, Component } from 'cc';
-import { GameManager } from '../Plugins/EFramework/GameManager';
-import { AudioManager } from '../Plugins/EFramework/Audio/AudioManager';
-import { TimerManager } from '../Plugins/EFramework/Time/TimerManager';
-import { ResourcesManager } from '../Plugins/EFramework/Resources/ResourcesManager';
-import { uiManager } from '../Plugins/EFramework/UI/UIManager';
 import { MainPanel } from './UI/MainPanel';
+import { ef } from "../Plugins/EFramework/Framework";
 
 const { ccclass, property } = _decorator;
 
@@ -21,12 +17,12 @@ const { ccclass, property } = _decorator;
 @ccclass('GameInit')
 export class GameInit extends Component {
     start() {
-        const gamemanager = GameManager.instance;
-        gamemanager.addChildManager(AudioManager.instance());
-        gamemanager.addChildManager(TimerManager.instance());
-        gamemanager.addChildManager(ResourcesManager.instance());
+        ef.gameManager.addChildManager(ef.resourcesManager);
+        ef.gameManager.addChildManager(ef.audioManager);
+        ef.gameManager.addChildManager(ef.timerManager);
+        ef.gameManager.addChildManager(ef.uiManager);
 
-        uiManager.open(MainPanel);
+        ef.uiManager.open(MainPanel);
     }
 
 }

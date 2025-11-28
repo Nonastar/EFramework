@@ -2,8 +2,8 @@ import { js } from "cc";
 import ELogger from "./ELogger";
 
 /** 编解码器基类 */
-abstract class MKCodecBase {
-	constructor(option_?: MKCodecBase_.Config) {
+abstract class ECodecBase {
+	constructor(option_?: ECodecBase_.Config) {
 		if (option_) {
 			this._config = option_;
 		}
@@ -11,7 +11,7 @@ abstract class MKCodecBase {
 
 	/* --------------- protected --------------- */
 	/** 配置信息 */
-	protected _config!: MKCodecBase_.Config;
+	protected _config!: ECodecBase_.Config;
 
 	/** 日志 */
 	protected get _log(): ELogger {
@@ -33,7 +33,7 @@ abstract class MKCodecBase {
 	}
 }
 
-export namespace MKCodecBase_ {
+export namespace ECodecBase_ {
 	/** 配置信息 */
 	export class Config {
 		/** 加密函数 */
@@ -43,4 +43,4 @@ export namespace MKCodecBase_ {
 	}
 }
 
-export default MKCodecBase;
+export default ECodecBase;

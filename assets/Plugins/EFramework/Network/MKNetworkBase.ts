@@ -1,10 +1,25 @@
 import { js, Constructor, EventTarget } from "cc";
-import GlobalConfig from "../GlobalConfig";
 //import globalEvent from "../../Config/GlobalEvent";
-import MKCodecBase from "../MKCodecBase";
+import ECodecBase from "../Utiles/ECodecBase";
 import MKEventTarget from "../Event/EEvent";
 import Singleton from "../Utiles/Singleton";
 import MKStatusTask from "../Core/Task/ETask";
+
+
+	/** 网络 */
+	export namespace Network {
+		/** 消息头
+		 * @remarks
+		 * 收/发时网络消息类型时，必须包含的属性
+		 */
+		// eslint-disable-next-line @typescript-eslint/no-empty-interface
+		export interface ProtoHead {}
+
+		/** 消息头键 */
+		export const protoHeadKeyTab: { [key in keyof ProtoHead]: key } = new Proxy(Object.create(null), {
+			get: (target, key) => key,
+		});
+	}
 
 namespace _MKNetworkBase {
 	/** 从 T 中排除 null, undefined, void */
@@ -12,7 +27,7 @@ namespace _MKNetworkBase {
 	type TypeNonVoid<T> = T extends null | undefined | void ? never : T;
 
 	/** 消息协议 */
-	export interface EventProtocol<T extends MKCodecBase = MKCodecBase> {
+	export interface EventProtocol<T extends ECodecBase = ECodecBase> {
 		/** 网络连接 */
 		open(): void;
 		/**
@@ -38,7 +53,7 @@ namespace _MKNetworkBase {
 	}
 
 	/** 消息事件 */
-	export class MessageEvent<CT extends MKCodecBase = MKCodecBase> extends EventTarget {
+	export class MessageEvent<CT extends ECodecBase = ECodecBase> extends EventTarget {
 		constructor(network_: MKNetworkBase) {
 			super();
 			this._network = network_;
@@ -50,7 +65,7 @@ namespace _MKNetworkBase {
 		/** 日志 */
 		/* ------------------------------- 功能 ------------------------------- */
 		// @ts-ignore
-		on<T extends Constructor<GlobalConfig.Network.ProtoHead> | string | number, T2 extends (event_: T["prototype"]) => void>(
+		on<T extends Constructor<Network.ProtoHead> | string | number, T2 extends (event_: T["prototype"]) => void>(
 			type_: T,
 			callback_: T2,
 			target_?: any,
@@ -76,7 +91,7 @@ namespace _MKNetworkBase {
 		}
 
 		// @ts-ignore
-		once<T extends Constructor<GlobalConfig.Network.ProtoHead> | string | number, T2 extends (event_: T["prototype"]) => void>(
+		once<T extends Constructor<Network.ProtoHead> | string | number, T2 extends (event_: T["prototype"]) => void>(
 			type_: T,
 			callback_: T2,
 			this_?: any
@@ -85,7 +100,7 @@ namespace _MKNetworkBase {
 		}
 
 		// @ts-ignore
-		off<T extends Constructor<GlobalConfig.Network.ProtoHead> | string | number, T2 extends (event_: T["prototype"]) => void>(
+		off<T extends Constructor<Network.ProtoHead> | string | number, T2 extends (event_: T["prototype"]) => void>(
 			type_: T,
 			callback_?: T2,
 			this_?: any
@@ -109,7 +124,7 @@ namespace _MKNetworkBase {
 		 * @remarks
 		 * 接收消息后派发，可用此接口模拟数据
 		 */
-		emit<T extends GlobalConfig.Network.ProtoHead>(data_: T): void;
+		emit<T extends Network.ProtoHead>(data_: T): void;
 		/**
 		 * 派发事件
 		 * @param type_ 消息号
@@ -118,7 +133,7 @@ namespace _MKNetworkBase {
 		 * 接收消息后派发，可用此接口模拟数据
 		 */
 		emit<T extends string | number>(type_: T, data_: any): void;
-		emit<T extends Constructor<GlobalConfig.Network.ProtoHead> | string | number>(args_: T, data_?: any): void {
+		emit<T extends Constructor<Network.ProtoHead> | string | number>(args_: T, data_?: any): void {
 			let type_: string | number | undefined;
 
 			// 参数转换
@@ -171,7 +186,7 @@ namespace _MKNetworkBase {
 		}
 
 		// @ts-ignore
-		has<T extends Constructor<GlobalConfig.Network.ProtoHead> | string | number, T2 extends (event_: T["prototype"]) => void>(
+		has<T extends Constructor<Network.ProtoHead> | string | number, T2 extends (event_: T["prototype"]) => void>(
 			type_: T,
 			callback_?: T2,
 			target_?: any
@@ -210,7 +225,7 @@ namespace _MKNetworkBase {
  *
  * - 网络消息模拟
  */
-abstract class MKNetworkBase<CT extends MKCodecBase = MKCodecBase> extends Singleton {
+abstract class MKNetworkBase<CT extends ECodecBase = ECodecBase> extends Singleton {
 	constructor(init_?: Partial<MKNetworkBase_.InitConfig<CT>>) {
 		super();
 		this.config = new MKNetworkBase_.InitConfig(init_);
@@ -649,7 +664,7 @@ export namespace MKNetworkBase_ {
 	}
 
 	/** 初始化配置 */
-	export class InitConfig<CT extends MKCodecBase = MKCodecBase> {
+	export class InitConfig<CT extends ECodecBase = ECodecBase> {
 		constructor(init_?: Partial<InitConfig<CT>>) {
 			Object.assign(this, init_);
 		}
@@ -707,7 +722,7 @@ export namespace MKNetworkBase_ {
 	}
 
 	/** 发送潮 */
-	export class SendTide<CT extends MKCodecBase = MKCodecBase> {
+	export class SendTide<CT extends ECodecBase = ECodecBase> {
 		/**
 		 * @param network_ 网络实例
 		 * @param intervalMsN_ 发送间隔

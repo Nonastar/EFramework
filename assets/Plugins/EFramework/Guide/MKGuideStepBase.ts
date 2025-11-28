@@ -1,6 +1,6 @@
 import { EDITOR } from "cc/env";
 //import mkToolFunc from "../@Private/Tool/MKToolFunc";
-import { mkLog } from "../Utiles/ELogger";
+import { eLog } from "../Utiles/ELogger";
 import type MKGuideManage from "./MKGuideManage";
 import type { MKGuideManage_ } from "./MKGuideManage";
 import { _decorator, Component } from "cc";
@@ -98,7 +98,7 @@ abstract class MKGuideStepBase<CT extends Record<string, MKGuideManage_.OperateC
 	 */
 	protected _next(initData_?: any): void {
 		if (this.nextStepNumList === undefined) {
-			mkLog.error("下个步骤序号为空");
+			eLog.error("下个步骤序号为空");
 
 			return;
 		}

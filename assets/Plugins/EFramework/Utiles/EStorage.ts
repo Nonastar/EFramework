@@ -1,5 +1,5 @@
 import { sys } from "cc";
-import MKCodecBase from "./MKCodecBase";
+import ECodecBase from "./ECodecBase";
 import MKTaskPipeline from "../Core/Task/ETaskPipeline";
 
 /**
@@ -8,8 +8,8 @@ import MKTaskPipeline from "../Core/Task/ETaskPipeline";
  * @remarks
  * 注意：在未设置 nameStr(存储器名) 之前，存储数据将不会被存储在硬盘，而是在内存中
  */
-class MKStorage<CT extends Object> {
-	constructor(init_: MKStorage_.InitConfig<CT>) {
+class EStorage<CT extends Object> {
+	constructor(init_: EStorage_.InitConfig<CT>) {
 		this._initConfig = init_;
 
 		if (typeof init_.writeIntervalMsNum === "number") {
@@ -40,7 +40,7 @@ class MKStorage<CT extends Object> {
 	}
 	/* --------------- private --------------- */
 	/** 初始化配置 */
-	private _initConfig: MKStorage_.InitConfig<CT>;
+	private _initConfig: EStorage_.InitConfig<CT>;
 	/** 缓存数据 */
 	private _cache: CT = Object.create(null);
 	/** 写入任务 */
@@ -222,17 +222,17 @@ class MKStorage<CT extends Object> {
 	}
 }
 
-export namespace MKStorage_ {
+export namespace EStorage_ {
 	export interface InitConfig<CT extends Object> {
 		/** 存储器名 */
 		nameStr?: string;
 		/** 存储数据 */
 		data: CT;
 		/** 编解码器 */
-		codec?: MKCodecBase;
+		codec?: ECodecBase;
 		/** 写入间隔（毫秒） */
 		writeIntervalMsNum?: number;
 	}
 }
 
-export default MKStorage;
+export default EStorage;

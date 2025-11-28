@@ -1,11 +1,11 @@
-import MKCodecBase from "../../MKCodecBase"
+import ECodecBase from "../../Utiles/ECodecBase"
 import MKNetworkBase, { MKNetworkBase_ } from "../MKNetworkBase";
 
 /**
  * 微信 websocket
  * @noInheritDoc
  */
-class MKWebsocketWX<CT extends MKCodecBase = MKCodecBase> extends MKNetworkBase<CT> {
+class MKWebsocketWX<CT extends ECodecBase = ECodecBase> extends MKNetworkBase<CT> {
 	constructor(config_?: Partial<MKWebsocketWX_.InitConfig<CT>>) {
 		super(config_);
 		this.config = new MKWebsocketWX_.InitConfig(config_);
@@ -40,7 +40,7 @@ class MKWebsocketWX<CT extends MKCodecBase = MKCodecBase> extends MKNetworkBase<
 }
 
 export namespace MKWebsocketWX_ {
-	export class InitConfig<CT extends MKCodecBase = MKCodecBase> extends MKNetworkBase_.InitConfig<CT> {
+	export class InitConfig<CT extends ECodecBase = ECodecBase> extends MKNetworkBase_.InitConfig<CT> {
 		constructor(init_?: Partial<InitConfig<CT>>) {
 			super(init_);
 			Object.assign(this, init_);

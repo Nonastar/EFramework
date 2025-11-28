@@ -1,10 +1,39 @@
-import { EDITOR } from "cc/env";
+import { EDITOR, DEBUG } from "cc/env";
 import Singleton from "./Singleton";
 //import MKHttp from "./Network/MKHttp";
-import GlobalConfig from "../GlobalConfig";
 import { sys, debug, log, warn, error } from "cc";
 
-namespace _ELogger {
+
+namespace Log {
+	export enum Level {
+		/** 禁止所有日志输出 */
+		None,
+		/** 调试 */
+		Debug = 1,
+		/** 打印 */
+		Log = 2,
+		/** 警告 */
+		Warn = 4,
+		/** 错误 */
+		Error = 8,
+		/** debug 及以上 */
+		DebugUp = Debug | Log | Warn | Error,
+		/** log 及以上 */
+		LogUp = Log | Warn | Error,
+		/** warn 及以上 */
+		WarnUp = Warn | Error,
+	}
+
+	/** 打印对象类型 */
+	export enum LogObjectType {
+		/** 框架，等级限制，打印模块限制 */
+		MK,
+		/** 控制台，可以跳转打印位置 */
+		Console,
+		/** cocos，等级限制 */
+		CC,
+	}
+
 	/** 计时日志 */
 	export interface TimeLog {
 		/** 开始时间 */
@@ -12,6 +41,19 @@ namespace _ELogger {
 		/** 上次毫秒 */
 		lastTimeMsNum: number;
 	}
+
+	export const config = new (class {
+		/** 日志缓存行数 */
+		cacheRowNum = 100;
+		/** 报错日志上传地址 */
+		errorUploadAddrStr = "";
+		/** 日志等级 */
+		levelNum = DEBUG ? Level.LogUp : Level.Error;
+		/** 打印对象类型 */
+		logObjectType = LogObjectType.Console;
+		/** 错误处理函数 */
+		errorHandlingFunc?: (...argsList: any[]) => any;
+	})();
 }
 
 /**
@@ -41,24 +83,24 @@ class ELogger extends Singleton {
 		}
 
 		// 替换日志函数
-		if (ELogger._config.logObjectType === GlobalConfig.Log.LogObjectType.Console) {
+		if (ELogger._config.logObjectType === Log.LogObjectType.Console) {
 			this.debug =
-				ELogger._config.levelNum & GlobalConfig.Log.Level.Debug
+				ELogger._config.levelNum & Log.Level.Debug
 					? this._logFuncTab[ELogger._config.logObjectType].Debug
 					: (...argsList_: any[]) => null;
 
 			this.log =
-				ELogger._config.levelNum & GlobalConfig.Log.Level.Log
+				ELogger._config.levelNum & Log.Level.Log
 					? this._logFuncTab[ELogger._config.logObjectType].Log
 					: (...argsList_: any[]) => null;
 
 			this.warn =
-				ELogger._config.levelNum & GlobalConfig.Log.Level.Warn
+				ELogger._config.levelNum & Log.Level.Warn
 					? this._logFuncTab[ELogger._config.logObjectType].Warn
 					: (...argsList_: any[]) => null;
 
 			this.error =
-				ELogger._config.levelNum & GlobalConfig.Log.Level.Error
+				ELogger._config.levelNum & Log.Level.Error
 					? this._logFuncTab[ELogger._config.logObjectType].Error
 					: (...argsList_: any[]) => null;
 		}
@@ -69,7 +111,7 @@ class ELogger extends Singleton {
 
 			const uploadFunc = (...argsList: any[]): void => {
 				// 添加日志缓存
-				ELogger._addLogCache(GlobalConfig.Log.Level.Error, eLog._getLogHead(GlobalConfig.Log.Level.Error, true), argsList);
+				ELogger._addLogCache(Log.Level.Error, eLog._getLogHead(Log.Level.Error, true), argsList);
 
 				// 上传错误日志
 				if (ELogger._config.errorUploadAddrStr) {
@@ -123,7 +165,7 @@ class ELogger extends Singleton {
 
 	/* --------------- static --------------- */
 	/** 全局配置 */
-	private static _config = GlobalConfig.Log.config;
+	private static _config = Log.config;
 	/** 初始化状态 */
 	private static _isInit = false;
 	/** 所有 log 对象 */
@@ -139,21 +181,21 @@ class ELogger extends Singleton {
 	private _nameStr!: string;
 	/** 日志函数表 */
 	private _logFuncTab = {
-		[GlobalConfig.Log.LogObjectType.MK]: {
+		[Log.LogObjectType.MK]: {
 			target: console,
 			Debug: console.debug,
 			Log: console.log,
 			Warn: console.warn,
 			Error: console.error,
 		},
-		[GlobalConfig.Log.LogObjectType.Console]: {
+		[Log.LogObjectType.Console]: {
 			target: console,
 			Debug: console.debug,
 			Log: console.log,
 			Warn: console.warn,
 			Error: console.error,
 		},
-		[GlobalConfig.Log.LogObjectType.CC]: {
+		[Log.LogObjectType.CC]: {
 			target: cc,
 			Debug: debug,
 			Log: log,
@@ -163,7 +205,7 @@ class ELogger extends Singleton {
 	};
 
 	/** 计时信息 */
-	private _timeMap = new Map<string, _ELogger.TimeLog>();
+	private _timeMap = new Map<string, Log.TimeLog>();
 	/* ------------------------------- static ------------------------------- */
 	/**
 	 * 只限模块打印
@@ -194,7 +236,7 @@ class ELogger extends Singleton {
 	 * @param argsList_ 参数
 	 * @returns
 	 */
-	private static _addLogCache(level_: GlobalConfig.Log.Level, headStr_: string, ...argsList_: any[]): void {
+	private static _addLogCache(level_: Log.Level, headStr_: string, ...argsList_: any[]): void {
 		if (!argsList_?.length || ELogger._config.cacheRowNum <= 0) {
 			return;
 		}
@@ -204,7 +246,7 @@ class ELogger extends Singleton {
 
 		// 填充参数内容
 		{
-			if (level_ === GlobalConfig.Log.Level.Error) {
+			if (level_ === Log.Level.Error) {
 				argsList_.forEach((v) => {
 					let jsonStr = "";
 
@@ -240,19 +282,19 @@ class ELogger extends Singleton {
 
 	/* ------------------------------- 功能 ------------------------------- */
 	debug(...argsList_: any[]): void {
-		this._log(GlobalConfig.Log.Level.Debug, ...argsList_);
+		this._log(Log.Level.Debug, ...argsList_);
 	}
 
 	log(...argsList_: any[]): void {
-		this._log(GlobalConfig.Log.Level.Log, ...argsList_);
+		this._log(Log.Level.Log, ...argsList_);
 	}
 
 	warn(...argsList_: any[]): void {
-		this._log(GlobalConfig.Log.Level.Warn, ...argsList_);
+		this._log(Log.Level.Warn, ...argsList_);
 	}
 
 	error(...argsList_: any[]): void {
-		this._log(GlobalConfig.Log.Level.Error, ...argsList_);
+		this._log(Log.Level.Error, ...argsList_);
 	}
 
 	/** 计时开始 */
@@ -263,12 +305,12 @@ class ELogger extends Singleton {
 			return;
 		}
 
-		const timeLog: _ELogger.TimeLog = Object.create(null);
+		const timeLog: Log.TimeLog = Object.create(null);
 
 		timeLog.startTimeMsNum = timeLog.lastTimeMsNum = Date.now();
 		this._timeMap.set(nameStr_, timeLog);
 		if (argsList_?.length) {
-			this._log(GlobalConfig.Log.Level.Log, nameStr_, ...argsList_);
+			this._log(Log.Level.Log, nameStr_, ...argsList_);
 		}
 	}
 
@@ -285,7 +327,7 @@ class ELogger extends Singleton {
 		const currTimeMsNum = Date.now();
 
 		if (argsList_?.length) {
-			this._log(GlobalConfig.Log.Level.Log, nameStr_, ...argsList_, `耗时：${(currTimeMsNum - timeLog.lastTimeMsNum) / 1000}s`);
+			this._log(Log.Level.Log, nameStr_, ...argsList_, `耗时：${(currTimeMsNum - timeLog.lastTimeMsNum) / 1000}s`);
 		}
 
 		timeLog.lastTimeMsNum = currTimeMsNum;
@@ -301,25 +343,25 @@ class ELogger extends Singleton {
 			return;
 		}
 
-		this._log(GlobalConfig.Log.Level.Log, nameStr_, ...argsList_, `总耗时：${(Date.now() - timeLog.startTimeMsNum) / 1000}s`);
+		this._log(Log.Level.Log, nameStr_, ...argsList_, `总耗时：${(Date.now() - timeLog.startTimeMsNum) / 1000}s`);
 		this._timeMap.delete(nameStr_);
 	}
 
 	/** 日志头 */
-	private _getLogHead(level_: GlobalConfig.Log.Level, isAddTime_ = true): string {
+	private _getLogHead(level_: Log.Level, isAddTime_ = true): string {
 		const date = new Date();
 
 		if (isAddTime_) {
 			/** 当前日期时间 */
 			const timeStr = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}.${date.getMilliseconds()}`;
 
-			return `${this._nameStr} <${GlobalConfig.Log.Level[level_]}> [${timeStr}]：`;
+			return `${this._nameStr} <${Log.Level[level_]}> [${timeStr}]：`;
 		} else {
-			return `${this._nameStr} <${GlobalConfig.Log.Level[level_]}>：`;
+			return `${this._nameStr} <${Log.Level[level_]}>：`;
 		}
 	}
 
-	private _log(level_: GlobalConfig.Log.Level, ...argsList_: any[]): void {
+	private _log(level_: Log.Level, ...argsList_: any[]): void {
 		// 打印等级限制
 		if (!(ELogger._config.levelNum & level_)) {
 			return;
@@ -343,7 +385,7 @@ class ELogger extends Singleton {
 		// 更新缓存
 		ELogger._addLogCache(level_, headStr, ...argsList_);
 		// 打印日志
-		logger[GlobalConfig.Log.Level[level_]].call(logger.target, headStr, ...argsList_);
+		logger[Log.Level[level_]].call(logger.target, headStr, ...argsList_);
 	}
 }
 

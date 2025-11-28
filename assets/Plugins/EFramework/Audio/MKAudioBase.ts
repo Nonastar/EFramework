@@ -3,13 +3,23 @@ import { EDITOR } from "cc/env";
 import EEvent from "../Event/EEvent";
 import ELogger from "../Utiles/ELogger";
 //import globalEvent from "../GlobalEvent";
-import GlobalConfig from "../GlobalConfig";
 import MKRelease, { MKRelease_ } from "../Resources/MKRelease";
 // eslint-disable-next-line unused-imports/no-unused-imports
 import { _decorator, AudioClip, AudioSource, director, Enum, find, Node } from "cc";
 //import mkToolObject from "../@Private/Tool/MKToolObject";
 
 const { ccclass, property } = _decorator;
+
+	/** 音频 */
+	export namespace Audio {
+		/** 音频类型（小于 0 防止和其他位置定义的音频组冲突） */
+		export enum Type {
+			/** 音效 */
+			Effect = -99,
+			/** 音乐 */
+			Music,
+		}
+	}
 
 /**
  * 音频基类
@@ -166,7 +176,7 @@ abstract class MKAudioBase {
 			}
 
 			audio = await this.add(audio_, node, {
-				type: GlobalConfig.Audio.Type.Effect,
+				type: Audio.Type.Effect,
 			});
 		} else {
 			audio = audio_;
@@ -208,12 +218,12 @@ abstract class MKAudioBase {
 	 * 不会阻止后续音频播放
 	 */
 	pauseAll(): void {
-		for (const kStr in GlobalConfig.Audio.Type) {
+		for (const kStr in Audio.Type) {
 			if (!isNaN(Number(kStr))) {
 				continue;
 			}
 
-			const v = GlobalConfig.Audio.Type[kStr] as unknown as GlobalConfig.Audio.Type;
+			const v = Audio.Type[kStr] as unknown as Audio.Type;
 
 			this._groupMap.get(v)?.pause();
 		}
@@ -221,12 +231,12 @@ abstract class MKAudioBase {
 
 	/** 恢复所有暂停的音频 */
 	resumeAll(): void {
-		for (const kStr in GlobalConfig.Audio.Type) {
+		for (const kStr in Audio.Type) {
 			if (!isNaN(Number(kStr))) {
 				continue;
 			}
 
-			const v = GlobalConfig.Audio.Type[kStr] as unknown as GlobalConfig.Audio.Type;
+			const v = Audio.Type[kStr] as unknown as Audio.Type;
 
 			this._groupMap.get(v)?.play(MKAudioBase_.State.Pause);
 		}
@@ -237,12 +247,12 @@ abstract class MKAudioBase {
 	 * @param isPreventPlay_ 阻止后续播放，恢复后续播放则执行对应分组的 stop(false)；默认值 false
 	 */
 	stopAll(isPreventPlay_ = false): void {
-		for (const kStr in GlobalConfig.Audio.Type) {
+		for (const kStr in Audio.Type) {
 			if (!isNaN(Number(kStr))) {
 				continue;
 			}
 
-			const v = GlobalConfig.Audio.Type[kStr] as unknown as GlobalConfig.Audio.Type;
+			const v = Audio.Type[kStr] as unknown as Audio.Type;
 
 			if (isPreventPlay_) {
 				this._groupMap.get(v)?.stop();
@@ -367,7 +377,7 @@ export namespace MKAudioBase_ {
 	/** add 配置 */
 	export interface AddConfig<T extends boolean> {
 		/** 类型 */
-		type?: GlobalConfig.Audio.Type;
+		type?: Audio.Type;
 		/** 分组 */
 		groupIdNumList?: number[];
 		/** 文件夹 */
@@ -417,9 +427,9 @@ export namespace MKAudioBase_ {
 		/** 音频类型 */
 		@property({
 			displayName: "音频类型",
-			type: Enum(GlobalConfig.Audio.Type),
+			type: Enum(Audio.Type),
 		})
-		type = GlobalConfig.Audio.Type.Effect;
+		type = Audio.Type.Effect;
 
 		/* --------------- public --------------- */
 		/** 事件对象 */

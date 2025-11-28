@@ -1,5 +1,5 @@
 import Singleton from "../Utiles/Singleton";
-import MKCodecBase from "../MKCodecBase";
+import ECodecBase from "../Utiles/ECodecBase";
 import { sys } from "cc";
 
 /**
@@ -139,7 +139,7 @@ export namespace MKHttp_ {
 		/** 返回数据类型 */
 		returnType?: XMLHttpRequestResponseType;
 		/** 编解码器 */
-		codec?: MKCodecBase;
+		codec?: ECodecBase;
 		/** 内容 */
 		body?: Document | Blob | BufferSource | FormData | URLSearchParams | string;
 		/** 标头 */

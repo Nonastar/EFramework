@@ -3,7 +3,6 @@ import EEvent from "../Event/EEvent";
 import { EDITOR, PREVIEW } from "cc/env";
 import ETask from "../Core/Task/ETask";
 /** @weak */
-import type { MKDataSharer_ } from "../Utiles/MKDataSharer";
 //import mkToolFunc from "../@Private/Tool/MKToolFunc";
 import MKRelease, { MKRelease_ } from "./MKRelease";
 import { game, Game, director, Director, Scene, AssetManager, assetManager, js, Component, NodePool } from "cc";
@@ -719,9 +718,7 @@ export namespace MKBundle_ {
 		nodePoolTab!: Record<string, NodePool>;
 		/** 事件对象 */
 		event?: EEvent<any>;
-		/** 数据共享器 */
-		// @weak-start-include-MKDataSharer
-		data?: MKDataSharer_.Api<any>;
+		
 		// @weak-end
 		/**
 		 * 事件对象列表
@@ -789,9 +786,6 @@ export namespace MKBundle_ {
 				v.targetOff?.(this);
 			});
 
-			// 清理数据
-			// @weak-start-include-MKDataSharer
-			this.data?.reset();
 			// @weak-end
 
 			// 清理对象池

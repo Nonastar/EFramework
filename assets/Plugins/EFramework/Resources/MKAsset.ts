@@ -4,9 +4,9 @@ import Singleton from "../Utiles/Singleton";
 import ELogger from "../Utiles/ELogger";
 import mkBundle from "./MKBundle";
 //import mkGame from "../MKGame";
-import GlobalConfig from "../GlobalConfig";
 import MKRelease, { MKRelease_ } from "./MKRelease";
 import { Asset, Constructor, DynamicAtlasManager, ImageAsset, SpriteFrame, Texture2D, assetManager } from "cc";
+
 
 namespace _MKAsset {
 	/** loadRemote 配置类型 */
@@ -39,6 +39,29 @@ namespace _MKAsset {
 		/** 资源 */
 		asset!: Asset;
 	}
+
+	/** bundle 键 */
+		interface Bundle {
+			internal: any;
+			resources: any;
+			main: any;
+			// eslint-disable-next-line @typescript-eslint/naming-convention
+			Config: any;
+			// eslint-disable-next-line @typescript-eslint/naming-convention
+			Framework: any;
+		}
+
+		/** bundle 键 */
+		export const bundle: { [k in keyof Bundle]: k } = new Proxy(Object.create(null), {
+			get: (target, key) => key,
+		});
+
+		export const config = new (class {
+			/** 缓存生命时长（毫秒，资源未使用时经过多久释放） */
+			cacheLifetimeMsNum = 1000;
+			/** 加载失败重试次数 */
+			retryCountOnLoadFailureNum = 0;
+		})();
 }
 
 /**
@@ -54,7 +77,7 @@ namespace _MKAsset {
  *
  * - 加载路径扩展，例：db://xxx.prefab
  *
- * - 资源默认引用为 2，引用为 1 时将在 GlobalConfig.Resources.cacheLifetimeMsNum 时间后自动释放
+ * - 资源默认引用为 2，引用为 1 时将在 Resources.cacheLifetimeMsNum 时间后自动释放
  *
  * - 增加强制性资源跟随释放对象
  *
@@ -106,7 +129,7 @@ export class MKAsset extends Singleton {
 					);
 
 					// 缓存生命时长为 0 立即释放
-					if (GlobalConfig.Asset.config.cacheLifetimeMsNum === 0) {
+					if (_MKAsset.config.cacheLifetimeMsNum === 0) {
 						self._autoReleaseAsset();
 					}
 				}
@@ -148,7 +171,7 @@ export class MKAsset extends Singleton {
 
 	/* --------------- static --------------- */
 	/** 全局配置 */
-	private static _config = GlobalConfig.Asset.config;
+	private static _config = _MKAsset.config;
 
 	/* --------------- private --------------- */
 	/** 日志 */
@@ -182,7 +205,7 @@ export class MKAsset extends Singleton {
 		const isRemote = Boolean(getConfig.remoteOption);
 
 		// 参数补齐
-		getConfig.retryNum = getConfig.retryNum ?? GlobalConfig.Asset.config.retryCountOnLoadFailureNum;
+		getConfig.retryNum = getConfig.retryNum ?? _MKAsset.config.retryCountOnLoadFailureNum;
 
 		// 参数转换
 		{
@@ -381,7 +404,7 @@ export class MKAsset extends Singleton {
 		let assetConfig: _MKAsset.LoadAnyRequestType;
 
 		// 参数补齐
-		getConfig.retryNum = getConfig.retryNum ?? GlobalConfig.Asset.config.retryCountOnLoadFailureNum;
+		getConfig.retryNum = getConfig.retryNum ?? _MKAsset.config.retryCountOnLoadFailureNum;
 
 		// 参数转换
 		{
@@ -668,7 +691,7 @@ export namespace MKAsset_ {
 		remoteOption?: _MKAsset.LoadRemoteOptionType;
 		/**
 		 * 失败重试次数
-		 * @defaultValue GlobalConfig.Asset.Config.retryCountOnLoadFailureNum
+		 * @defaultValue Asset.Config.retryCountOnLoadFailureNum
 		 */
 		retryNum?: number;
 	}

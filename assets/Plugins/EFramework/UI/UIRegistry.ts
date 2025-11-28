@@ -24,7 +24,7 @@ export class UIRegistry {
         this._configs.set(panelName, config);
         this._classes.set(panelName, panelClass);
         
-        console.log(`界面已注册: ${panelName}`, config);
+        console.log(`register ui : ${panelName}`, config);
     }
 
         /**

@@ -3,7 +3,7 @@ import ELogger from "../Utiles/ELogger";
 import { UIPanelBase } from "./UIPanelBase";
 import { Constructor, Prefab, Node, instantiate, find } from "cc";
 import { UIRegistry } from "./UIRegistry";
-import mkAsset from "../Resources/MKAsset";
+import { ef } from "../Framework";
 
 class UIManager extends Singleton implements IManager {
     private log = new ELogger("UIManager");
@@ -11,7 +11,7 @@ class UIManager extends Singleton implements IManager {
     private openPanelList: UIPanelBase[] = [];
 
     public async open<T extends Constructor<UIPanelBase>>(ui: T, ...args: any[]) {
-        this.log.log("open", ui);
+        this.log.log("open", ui.name);
         const panel = new ui(...args);
         const config = UIRegistry.getConfig(ui.name);
         if (!config) {
@@ -24,18 +24,22 @@ class UIManager extends Singleton implements IManager {
             return;
         }
         
-        const source = await mkAsset.get(prefabPath, Prefab, null);
+        const source = await ef.resourcesManager.loadAsset(prefabPath, Prefab, null);
         const node = instantiate(source) as Node;
         panel.bindNode(node);
-        const canvas = find("Canvas");
-        if (canvas) {
-            canvas.addChild(node);
-        }
-
+        
+        this.setPanelParent(panel, config.layer);
 
         this.openPanelList.push(panel);
         panel.onLoad();
         panel.onShow();
+    }
+
+    private setPanelParent(panel: UIPanelBase, layer: number) {
+        const canvas = find("Canvas");
+        if (canvas) {
+            canvas.addChild(panel.node);
+        }
     }
 
     public async close<T extends Constructor<UIPanelBase>, T2 extends UIPanelBase>(ui: T | T2) {
@@ -74,4 +78,4 @@ class UIManager extends Singleton implements IManager {
     }
 }
 
-export const uiManager = new UIManager();
+export {UIManager}

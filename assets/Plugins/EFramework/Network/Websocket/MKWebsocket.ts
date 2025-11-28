@@ -1,11 +1,11 @@
-import MKCodecBase from "../../MKCodecBase";
+import ECodecBase from "../../Utiles/ECodecBase";
 import MKNetworkBase, { MKNetworkBase_ } from "../MKNetworkBase";
 
 /**
  * 通用 websocket
  * @noInheritDoc
  */
-class MKWebsocket<CT extends MKCodecBase = MKCodecBase> extends MKNetworkBase<CT> {
+class MKWebsocket<CT extends ECodecBase = ECodecBase> extends MKNetworkBase<CT> {
 	constructor(config_?: Partial<MKWebsocket_.InitConfig<CT>>) {
 		super(config_);
 		this.config = new MKWebsocket_.InitConfig(config_);
@@ -37,7 +37,7 @@ class MKWebsocket<CT extends MKCodecBase = MKCodecBase> extends MKNetworkBase<CT
 }
 
 export namespace MKWebsocket_ {
-	export class InitConfig<CT extends MKCodecBase = MKCodecBase> extends MKNetworkBase_.InitConfig<CT> {
+	export class InitConfig<CT extends ECodecBase = ECodecBase> extends MKNetworkBase_.InitConfig<CT> {
 		constructor(init_?: Partial<InitConfig<CT>>) {
 			super(init_);
 			Object.assign(this, init_);
