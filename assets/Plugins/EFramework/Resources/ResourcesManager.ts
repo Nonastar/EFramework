@@ -202,6 +202,7 @@ class ResourcesManager extends Singleton {
 
 		// 参数补齐
 		getConfig.retryNum = getConfig.retryNum ?? _MKAsset.config.retryCountOnLoadFailureNum;
+        getConfig.bundleStr = "UI";
 
 		// 参数转换
 		{

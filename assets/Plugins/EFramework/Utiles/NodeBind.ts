@@ -5,10 +5,14 @@ const { ccclass, property } = _decorator;
 enum NodeType {
     Button = "cc.Button",
     Label = "cc.Label",
+    Sprite = "cc.Sprite",
     UITransform = "cc.UITransform",
     Camera = "cc.Camera",
     Canvas = "cc.Canvas",
     Widget = "cc.Widget",
+    Slider = "cc.Slider",
+    Progress = "cc.ProgressBar",
+
 
     Node = "Node",
 }

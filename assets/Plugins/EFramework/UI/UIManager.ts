@@ -1,16 +1,25 @@
 import Singleton from "../Utiles/Singleton";
 import ELogger from "../Utiles/ELogger";
 import { UIPanelBase } from "./UIPanelBase";
-import { Constructor, Prefab, Node, instantiate, find } from "cc";
+import { Constructor, Prefab, Node, instantiate, director } from "cc";
 import { UIRegistry } from "./UIRegistry";
 import { ef } from "../Framework";
+import { NodeBind } from "../Utiles/NodeBind";
 
 class UIManager extends Singleton implements IManager {
     private log = new ELogger("UIManager");
+    private canvas: NodeBind | null = null;
 
     private openPanelList: UIPanelBase[] = [];
 
-    public async open<T extends Constructor<UIPanelBase>>(ui: T, ...args: any[]) {
+    public async onInit() {
+        const node = director.getScene().getChildByName("Canvas");
+        director.addPersistRootNode(node);
+
+        this.canvas = node.getComponent(NodeBind)
+    }
+
+    public async openPanel<T extends Constructor<UIPanelBase>>(ui: T, ...args: any[]) {
         this.log.log("open", ui.name);
         const panel = new ui(...args);
         const config = UIRegistry.getConfig(ui.name);
@@ -35,14 +44,17 @@ class UIManager extends Singleton implements IManager {
         panel.onShow();
     }
 
-    private setPanelParent(panel: UIPanelBase, layer: number) {
-        const canvas = find("Canvas");
-        if (canvas) {
-            canvas.addChild(panel.node);
+    private setPanelParent(panel: UIPanelBase, layer: string) {
+        const parent = this.canvas.getNode(layer);
+        if (parent) {
+            parent.addChild(panel.node);
+        }
+        else {
+            this.log.error("not find canvas");
         }
     }
 
-    public async close<T extends Constructor<UIPanelBase>, T2 extends UIPanelBase>(ui: T | T2) {
+    public async closePanel<T extends Constructor<UIPanelBase>, T2 extends UIPanelBase>(ui: T | T2) {
         const panel = this.openPanelList.find(v => v === ui);
         if (!panel) {
             this.log.warn("not open ui: ", ui.constructor.name);

@@ -9,8 +9,6 @@ export abstract class Singleton implements IInitialize, IDisposable {
         return c._instance;
     }
 
-
-
     public beginInit(): void {
     }
 

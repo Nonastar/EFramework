@@ -1,11 +1,8 @@
 import { UIConfig,  UILayer, UIMaskType } from "../../Plugins/EFramework/UI/UIConfig";
 import { UIRegistry } from "../../Plugins/EFramework/UI/UIRegistry";
-import { TestPane2 } from "./TestPanel2";
-import { TestPane3 } from "./TestPanel3";
 
 
-UIRegistry.register(TestPane2, {prefab: "db://assets/resources/TestPanel2.prafab", layer: UILayer.Common});
-UIRegistry.register(TestPane3, {prefab: "db://assets/resources/TestPanel2.prafab", layer: UILayer.Common});
+//UIRegistry.register(TestPane2, {prefab: "db://assets/resources/TestPanel2.prafab", layer: UILayer.Common});
 
 
 // 便捷配置生成器
@@ -24,11 +21,11 @@ export class UIConfigBuilder {
     
     // 常用配置快捷方法
     static common(prefab: string, options?: Partial<UIConfig>): UIConfig {
-        return this.create(UILayer.Common, prefab, options);
+        return this.create(UILayer.View, prefab, options);
     }
     
     static popup(prefab: string, options?: Partial<UIConfig>): UIConfig {
-        return this.create(UILayer.Popup, prefab, {
+        return this.create(UILayer.View, prefab, {
             mask: UIMaskType.Black,
             ...options
         });

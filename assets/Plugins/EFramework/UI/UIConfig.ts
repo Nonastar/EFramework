@@ -14,10 +14,9 @@ export interface UIConfig {
 }
 
 export enum UILayer {
-    None = 0,
-    Common = 1,
-    Popup = 2,
-    Top = 3,
+    Game = "Game",
+    View = "View",
+    Top = "Top",
 }
 
 export enum UIType{

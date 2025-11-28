@@ -1,4 +1,4 @@
-import { uiManager } from "./UIManager";
+import { ef } from "../Framework";
 import { UIViewBase } from "./UIViewBase";
 
 class UIPanelBase extends UIViewBase {
@@ -34,11 +34,11 @@ class UIPanelBase extends UIViewBase {
 
     onClose(): void {
         console.log("UIPanelBase close");
-        uiManager.close(this);
+        ef.uiManager.closePanel(this);
     }
 
     close(): void {
-        this.childPanelList.forEach(v => uiManager.close(v));
+        this.childPanelList.forEach(v => ef.uiManager.closePanel(v));
         this.childPanelList = [];
     }
     

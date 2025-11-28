@@ -15,7 +15,7 @@ class GameManager extends Component {
     private _childManagers: IManager[] = [];
 
     public static get instance() {
-        if (GameManager._instance) return;
+        if (GameManager._instance) return GameManager._instance;
 
         const gameNode = new Node("GameManager");
         GameManager._instance = gameNode.addComponent(GameManager);

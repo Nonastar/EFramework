@@ -1,6 +1,6 @@
 import { _decorator, Component } from 'cc';
-import { MainPanel } from './UI/MainPanel';
 import { ef } from "../Plugins/EFramework/Framework";
+import { LoadingPanel } from './UI/LoadingPanel';
 
 const { ccclass, property } = _decorator;
 
@@ -22,7 +22,8 @@ export class GameInit extends Component {
         ef.gameManager.addChildManager(ef.timerManager);
         ef.gameManager.addChildManager(ef.uiManager);
 
-        ef.uiManager.open(MainPanel);
+        ef.uiManager.onInit();
+        ef.uiManager.openPanel(LoadingPanel);
     }
 
 }

@@ -8,7 +8,7 @@ import { ResourcesManager } from "./Resources/ResourcesManager";
 
 // 懒加载的全局Manager实例
 export const ef = {
-    get gameManager() {
+    get gameManager(){
         return GameManager.instance;
     },
 
