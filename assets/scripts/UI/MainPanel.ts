@@ -17,8 +17,8 @@ export class MainPanel extends UIPanelBase {
         super.onLoad();
         console.log("MainPanel loaded");
 
-        this.nodeBind.ButtonRegister("Close", this.onClose, this);
-        this.nodeBind.ButtonRegister("Enter", this.enterLevel, this);
+        this.nodeBind.RegisterClick("Close", this.onClose, this);
+        this.nodeBind.RegisterClick("Enter", this.enterLevel, this);
     }
 
     onShow() {

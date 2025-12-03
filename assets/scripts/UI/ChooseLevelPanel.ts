@@ -4,6 +4,8 @@ import { UILayer, UIMaskType } from "../../Plugins/EFramework/UI/UIConfig";
 import { VirtualScrollView } from "../../Plugins/vscrollview/VScrollView";
 import { ef } from "../../Plugins/EFramework/Framework";
 import { LevelPanel } from "./LevelPanel";
+import LevelLogic from "../Logic/LevelLogic";
+
 
 // 使用装饰器注册主界面
 @RegisterUI({
@@ -17,18 +19,20 @@ export class ChooseLevelPanel extends UIPanelBase {
     onLoad() {
         super.onLoad();
         this.scrollView = this.nodeBind.getNodeComponent("ScrollView", VirtualScrollView);
-        this.scrollView.onItemClickFn = this.onclickItem
+        this.scrollView.onItemClickFn = this.onclickItem.bind(this)
         console.log("ChooseLevelPanel loaded");
     }
 
-    onShow(): void {
+    async onShow() {
         super.onShow();
 
-        this.scrollView.setTotalCount(10);
+        const levelCount = await LevelLogic.instance().getLevelCount()
+        this.scrollView.setTotalCount(levelCount);
     }
 
     private onclickItem(item: any, index: number) {
         console.log("click item", index);
-        ef.uiManager.openPanel(LevelPanel);
+        ef.uiManager.openPanel(LevelPanel, index);
     }
+
 }
