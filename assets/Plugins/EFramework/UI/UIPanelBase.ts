@@ -8,8 +8,8 @@ class UIPanelBase extends UIViewBase {
         super.onLoad();
     }
 
-    onShow() {
-        super.onShow();
+    onShow(args?: any) {
+        super.onShow(args);
     }
 
     onHide() {

@@ -18,7 +18,7 @@ class UIViewBase  {
     onLoad() {
     }
     
-    onShow() {
+    onShow(args?: any) {
         this.node.active = true;
     }
 

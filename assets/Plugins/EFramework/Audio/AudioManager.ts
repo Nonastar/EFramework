@@ -1,4 +1,4 @@
-import { Singleton } from "../Utiles/Singleton";
+import Singleton from "../Utiles/Singleton";
 
 class AudioManager extends Singleton implements IManager {
     onUpdate(deltaTime: number): void {

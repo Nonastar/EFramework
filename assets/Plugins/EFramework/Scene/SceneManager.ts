@@ -1,6 +1,5 @@
-import { Singleton } from "../Utiles/Singleton";
+import Singleton  from "../Utiles/Singleton";
 
-class SceneManager extends Singleton<SceneManager> {
+class SceneManager extends Singleton {
 }
-
-export const sceneManager = SceneManager.instance();
+export default SceneManager;

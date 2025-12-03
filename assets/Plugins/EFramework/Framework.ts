@@ -5,10 +5,11 @@ import { AudioManager } from "./Audio/AudioManager";
 import { ResourcesManager } from "./Resources/ResourcesManager";
 //import { EventManager } from "./Event/EventManager";
 //import { SceneManager } from "./Scene/SceneManager";
+import Singleton from "./Utiles/Singleton";
 
 // 懒加载的全局Manager实例
 export const ef = {
-    get gameManager(){
+    get gameManager() {
         return GameManager.instance;
     },
 
@@ -31,17 +32,13 @@ export const ef = {
         return SceneManager.instance();
     }, */
 
+    // 导出Singleton类
+
     // GameManager特殊处理（需要手动初始化）
 
 };
 
 // 导出Manager类，方便直接使用
 export {
-    UIManager,
-    GameManager,
-    TimerManager,
-    AudioManager,
-    ResourcesManager,
-    //EventManager,
-    //SceneManager 
+    Singleton,
 };

@@ -1,7 +1,7 @@
 import Singleton from "../Utiles/Singleton";
 import ELogger from "../Utiles/ELogger";
 import { UIPanelBase } from "./UIPanelBase";
-import { Constructor, Prefab, Node, instantiate, director } from "cc";
+import { Constructor, Prefab, Node, Scene, Canvas,instantiate, director } from "cc";
 import { UIRegistry } from "./UIRegistry";
 import { ef } from "../Framework";
 import { NodeBind } from "../Utiles/NodeBind";
@@ -19,9 +19,9 @@ class UIManager extends Singleton implements IManager {
         this.canvas = node.getComponent(NodeBind)
     }
 
-    public async openPanel<T extends Constructor<UIPanelBase>>(ui: T, ...args: any[]) {
+    public async openPanel<T extends Constructor<UIPanelBase>>(ui: T, args?: any) {
         this.log.log("open", ui.name);
-        const panel = new ui(...args);
+        const panel = new ui();
         const config = UIRegistry.getConfig(ui.name);
         if (!config) {
             this.log.error(`not register ui: ${ui.name}`);
@@ -33,7 +33,8 @@ class UIManager extends Singleton implements IManager {
             return;
         }
         
-        const source = await ef.resourcesManager.loadAsset(prefabPath, Prefab, null);
+        
+        const source = await ef.resourcesManager.loadAsset(prefabPath, Prefab, null, {bundle: config.bundle});
         const node = instantiate(source) as Node;
         panel.bindNode(node);
         
@@ -41,7 +42,7 @@ class UIManager extends Singleton implements IManager {
 
         this.openPanelList.push(panel);
         panel.onLoad();
-        panel.onShow();
+        panel.onShow(args);
     }
 
     private setPanelParent(panel: UIPanelBase, layer: string) {
@@ -66,8 +67,8 @@ class UIManager extends Singleton implements IManager {
         this.log.log("close", ui.constructor.name);
     }
 
-    public findPanel<T extends Constructor<UIPanelBase>, T2 extends UIPanelBase>(ui: T | T2) {
-        return this.openPanelList.find(v => v === ui);
+    public findPanel<T extends UIPanelBase>(ui: Constructor<T> ) {
+        return this.openPanelList.find(v => v.constructor === ui) as T ;
     }
 
     public onUpdate(deltaTime: number): void {

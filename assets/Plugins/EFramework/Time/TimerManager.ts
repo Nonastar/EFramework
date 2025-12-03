@@ -1,4 +1,4 @@
-import { Singleton } from "../Utiles/Singleton";
+import Singleton from "../Utiles/Singleton";
 import { _decorator } from 'cc';
 
 type ICallback = (...args: any[]) => any;

@@ -1,5 +1,5 @@
-import { Singleton } from "../Utiles/Singleton";
 import { EventTarget } from "cc";
+import Singleton from "../Utiles/Singleton";
 
 
 class EventManager extends Singleton {

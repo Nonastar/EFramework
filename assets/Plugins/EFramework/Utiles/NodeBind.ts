@@ -1,4 +1,4 @@
-import { Node, Component, _decorator, Enum, Button } from "cc";
+import { Node, Component, _decorator, Enum, Button, Label, SpriteFrame, Sprite, Constructor } from "cc";
 
 const { ccclass, property } = _decorator;
 
@@ -124,19 +124,22 @@ export class NodeBind extends Component {
     /**
      * 获取绑定的组件
      */
-    public getNodeComponent<T extends Component>(key: string, componentType?: new () => T): T | null {
-        const t = this.componentMap[key];
-        if (!t) return null;
+    public getNodeComponent<T extends Component>(key: string, componentType?: Constructor<T>): T | null {
+        const target = this.componentMap[key];
+        if (!target) return null;
 
-        // 如果已经是目标组件类型，直接返回
-        if (t instanceof Component) {
-            const c = t as T;
-            if (c) return c;
+        if (target instanceof Component) {
+            // 如果指定了组件类型，检查类型匹配
+            if (componentType) {
+                return target instanceof componentType ? target as T : null;
+            }
+            // 未指定组件类型，直接返回组件实例
+            return target as T;
         }
 
-        // 如果是Node，尝试获取组件
-        if (t instanceof Node && componentType) {
-            return t.getComponent(componentType) as T || null;
+        // 如果是节点，尝试获取指定组件
+        if (target instanceof Node && componentType) {
+            return target.getComponent(componentType) as T || null;
         }
 
         return null;
@@ -152,8 +155,36 @@ export class NodeBind extends Component {
         }
     }
 
-    public ButtonRegister<T extends Function>(nodeName: string, callback: T, target?: any): void {
-        this.getNode(nodeName).on(Button.EventType.CLICK, callback, target);
+    public RegisterClick<T extends Function>(node: Node | string, callback: T, target?: any): void {
+        if (node instanceof Node) {
+            node.on(Button.EventType.CLICK, callback, target);
+        }
+        else {
+            this.getNode(node).on(Button.EventType.CLICK, callback, target);
+        }
+    }
+
+    public UnregisterClick<T extends Function>(node: Node | string, callback: T, target?: any): void {
+        if (node instanceof Node) {
+            node.off(Button.EventType.CLICK, callback, target);
+        }
+        else {
+            this.getNode(node).off(Button.EventType.CLICK, callback, target);
+        }
+    }
+
+    public SetLabelText(nodeName: string, text: string): void {
+        const label = this.getNodeComponent(nodeName, Label);
+        if (label) {
+            label.string = text;
+        }
+    }
+
+    public SetSpriteFrame(nodeName: string, spriteFrame: SpriteFrame): void {
+        const sprite = this.getNodeComponent(nodeName, Sprite);
+        if (sprite) {
+            sprite.spriteFrame = spriteFrame;
+        }
     }
 
 

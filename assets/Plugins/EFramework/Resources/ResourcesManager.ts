@@ -64,6 +64,38 @@ namespace _MKAsset {
 		})();
 }
 
+export namespace LoadConfig {
+	/** 加载文件夹配置 */
+	export interface DirConfig<T extends Asset> extends Omit<Config<T>, "completedFunc"> {
+		/** 完成回调 */
+		completedFunc?: (error: Error[] | null, asset: (T | null)[]) => void;
+	}
+
+	/** 加载配置 */
+	export interface Config<T extends Asset = Asset> {
+		/**
+		 * bundle 名
+		 */
+		bundle?: string;
+		/** 进度回调 */
+		progressFunc?: (
+			/** 当前进度 */
+			currentNum: number,
+			/** 总进度 */
+			totalNum: number
+		) => void;
+
+		/** 完成回调 */
+		completedFunc?: (error: Error | null, asset: T) => void;
+		/** 远程配置，存在配置则为远程资源 */
+		remoteOption?: _MKAsset.LoadRemoteOptionType;
+		/**
+		 * @defaultValue Asset.Config.retryCountOnLoadFailureNum
+		 */
+		retryNum?: number;
+	}
+}
+
 /**
  * 资源管理器
  * @noInheritDoc
@@ -194,7 +226,7 @@ class ResourcesManager extends Singleton {
 	 * @param config_ 获取配置
 	 * @returns
 	 */
-	loadAsset<T extends Asset>(path: string, type_: Constructor<T>, target_: MKRelease_.TypeFollowReleaseSupport, config_?: MKAsset_.GetConfig<T> ): Promise<T | null> {
+	loadAsset<T extends Asset>(path: string, type_: Constructor<T>, target_: MKRelease_.TypeFollowReleaseSupport, config_?: LoadConfig.Config<T> ): Promise<T | null> {
 		/** 获取配置 */
 		const getConfig = config_ ?? {};
 		/** 远程资源 */
@@ -202,7 +234,6 @@ class ResourcesManager extends Singleton {
 
 		// 参数补齐
 		getConfig.retryNum = getConfig.retryNum ?? _MKAsset.config.retryCountOnLoadFailureNum;
-        getConfig.bundleStr = "UI";
 
 		// 参数转换
 		{
@@ -215,7 +246,7 @@ class ResourcesManager extends Singleton {
 					const dirStr = path.slice(0, path.indexOf("/"));
 
 					path = path.slice(dirStr.length + 1);
-					getConfig.bundleStr = getConfig.bundleStr || dirStr;
+					getConfig.bundle = getConfig.bundle || dirStr;
 				}
 			}
 
@@ -242,9 +273,9 @@ class ResourcesManager extends Singleton {
 
 		// 填充 bundle 名
 		if (EDITOR && !window["cc"].GAME_VIEW) {
-			getConfig.bundleStr = getConfig.bundleStr || "resources";
+			getConfig.bundle = getConfig.bundle || "resources";
 		} else {
-			getConfig.bundleStr = getConfig.bundleStr || (mkBundle.bundleStr && mkBundle.bundleStr !== "main" ? mkBundle.bundleStr : "resources");
+			getConfig.bundle = getConfig.bundle || (mkBundle.bundleStr && mkBundle.bundleStr !== "main" ? mkBundle.bundleStr : "resources");
 		}
 
 		return new Promise<T | null>(async (resolveFunc) => {
@@ -255,9 +286,9 @@ class ResourcesManager extends Singleton {
 			/** 完成回调 */
 			const completedFunc = async (error: Error | null, asset: T): Promise<void> => {
 				if (error) {
-					this._log.error(`get ${path} 错误`, error);
+					this._log.error(`loadAsset ${path} 错误`, error);
 				} else {
-					this._log.debug(`get ${path} 完成`);
+					this._log.debug(`loadAsset ${path} 完成`);
 				}
 
 				if (EDITOR && !window["cc"].GAME_VIEW) {
@@ -315,7 +346,7 @@ class ResourcesManager extends Singleton {
 					}
 
 					assetConfig = getConfig.remoteOption;
-					assetConfig.bundle = getConfig.bundleStr;
+					assetConfig.bundle = getConfig.bundle;
 					assetConfig.type = type_;
 					// uuid
 					{
@@ -350,11 +381,11 @@ class ResourcesManager extends Singleton {
 			// 本地
 			else {
 				/** bundle 资源 */
-				const bundleAsset = await mkBundle.load(getConfig.bundleStr!);
+				const bundleAsset = await mkBundle.load(getConfig.bundle!);
 
 				if (!bundleAsset) {
 					this._log.error("未获取到 bundle 信息");
-					getConfig.completedFunc?.(new Error("未获取到 bundle 信息，" + getConfig.bundleStr), null!);
+					getConfig.completedFunc?.(new Error("未获取到 bundle 信息，" + getConfig.bundle), null!);
 					resolveFunc(null);
 
 					return;
@@ -393,7 +424,7 @@ class ResourcesManager extends Singleton {
 		pathStr_: string,
 		type_: Constructor<T>,
 		target_: MKRelease_.TypeFollowReleaseSupport,
-		config_?: MKAsset_.GetDirConfig<T>
+		config_?: LoadConfig.DirConfig<T>
 	): Promise<T[] | null> {
 		/** 获取配置 */
 		const getConfig = config_ ?? {};
@@ -414,7 +445,7 @@ class ResourcesManager extends Singleton {
 					const dirStr = pathStr_.slice(0, pathStr_.indexOf("/"));
 
 					pathStr_ = pathStr_.slice(dirStr.length + 1);
-					getConfig.bundleStr = getConfig.bundleStr || dirStr;
+					getConfig.bundle = getConfig.bundle || dirStr;
 				}
 			}
 
@@ -425,7 +456,7 @@ class ResourcesManager extends Singleton {
 				}
 
 				assetConfig = getConfig.remoteOption as any;
-				assetConfig.bundle = getConfig.bundleStr || (mkBundle.bundleStr && mkBundle.bundleStr !== "main" ? mkBundle.bundleStr : "resources");
+				assetConfig.bundle = getConfig.bundle || (mkBundle.bundleStr && mkBundle.bundleStr !== "main" ? mkBundle.bundleStr : "resources");
 				assetConfig.type = type_;
 				assetConfig.dir = pathStr_;
 			}
@@ -659,39 +690,6 @@ class ResourcesManager extends Singleton {
 	}
 }
 
-export namespace MKAsset_ {
-	/** 加载文件夹配置 */
-	export interface GetDirConfig<T extends Asset> extends Omit<GetConfig<T>, "completedFunc"> {
-		/** 完成回调 */
-		completedFunc?: (error: Error[] | null, asset: (T | null)[]) => void;
-	}
 
-	/** 加载配置 */
-	export interface GetConfig<T extends Asset = Asset> {
-		/**
-		 * bundle 名
-		 * @defaultValue
-		 * 编辑器：resources，运行时：mk.bundle.bundleStr(当前场景所属 bundle)
-		 */
-		bundleStr?: string;
-		/** 进度回调 */
-		progressFunc?: (
-			/** 当前进度 */
-			currentNum: number,
-			/** 总进度 */
-			totalNum: number
-		) => void;
-
-		/** 完成回调 */
-		completedFunc?: (error: Error | null, asset: T) => void;
-		/** 远程配置，存在配置则为远程资源 */
-		remoteOption?: _MKAsset.LoadRemoteOptionType;
-		/**
-		 * 失败重试次数
-		 * @defaultValue Asset.Config.retryCountOnLoadFailureNum
-		 */
-		retryNum?: number;
-	}
-}
 
 export {ResourcesManager}
